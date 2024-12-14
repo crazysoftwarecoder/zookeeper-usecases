@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  zookeeper1:
+    image: bitnami/zookeeper:latest
+    container_name: zookeeper1
+    environment:
+      - ZOO_SERVER_ID=1
+      - ZOO_SERVERS=0.0.0.0:2888:3888, zookeeper2:2888:3888, zookeeper3:2888:3888
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    ports:
+      - "2181:2181" # Expose ZooKeeper's client port
+    networks:
+      - zookeeper_net
+
+  zookeeper2:
+    image: bitnami/zookeeper:latest
+    container_name: zookeeper2
+    environment:
+      - ZOO_SERVER_ID=2
+      - ZOO_SERVERS=zookeeper1:2888:3888, 0.0.0.0:2888:3888, zookeeper3:2888:3888
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    networks:
+      - zookeeper_net
+
+  zookeeper3:
+    image: bitnami/zookeeper:latest
+    container_name: zookeeper3
+    environment:
+      - ZOO_SERVER_ID=3
+      - ZOO_SERVERS=zookeeper1:2888:3888, zookeeper2:2888:3888, 0.0.0.0:2888:3888
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    networks:
+      - zookeeper_net
+
+networks:
+  zookeeper_net:
+    driver: bridge
